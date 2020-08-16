@@ -116,3 +116,29 @@ exports.signin = function (req, res){
             })
         })
 }
+exports.forgotPassword = (req,res) =>{
+    if (!req.body.email ) {
+        res.status(400).send(
+            {
+                message: "Email cannot be empty"
+               
+            }
+        )
+        return
+    }
+    User.findOne({ where: { email: req.body.email  },raw : true })
+        .then((users)=>{
+           if (users === null) {
+                res.status(400).send({
+                    message:"No user found, please enter the correct email"
+                })
+           } else {
+                res.send({
+                    email:req.body.email,
+                    new_password: Math.random().toString(36).substring(7),
+                    message:"New password has been send to your email"
+                })
+           }
+        })
+   
+}
