@@ -19,7 +19,6 @@ exports.create = (req, res) =>{
             user_id : id_user
         }
         //loop all files (photos)
-      
         Keuangan.create(keuangan)
             .then((data)=>{
                 res.send(data)
@@ -71,14 +70,13 @@ exports.findAll = (req,res) =>{
             console.log
             Keuangan.findAll({where : {user_id : id_user, tanggal: req.body.tanggal},raw:true})
                     .then((keuangans)=>{
-                       // keuangan = JSON.parse(JSON.stringify(keuangans, null, 4))
                        for (const key in keuangans) {
                            if (keuangans.hasOwnProperty(key)) {
                                const keuangan = keuangans[key];
                                Bukti.findAll({where : {user_id : id_user,id_kegiatan: keuangan.id},raw:true})
                                     .then((buktis)=>{
                                         res.send({
-                                            nama:users.nama,
+                                            nama:`Selamat datang ${users.nama}`,
                                             kegiatan:keuangan.kegiatan,
                                             tanggal:keuangan.tanggal,
                                             bukti: buktis
@@ -94,7 +92,46 @@ exports.findAll = (req,res) =>{
             })
         })
 }
-
+exports.editKegiatan = (req, res) =>{
+    const token = req.headers.token
+    const id_kegiatan = req.params.id
+    User.findOne({ where: { token: token  },raw : true })
+        .then((users)=>{
+            const id_user = users.id
+            Keuangan.update({
+                kegiatan: req.body.kegiatan,
+                tanggal:req.body.tanggal,
+                harga: req.body.harga
+            },{
+              where:{id:id_kegiatan,user_id:id_user}
+            }).then((result)=>{
+                if (result == 1) {
+                    dataReq.forEach(
+                        dataReq.keysIn(req.files.photos),
+                        (key) => {
+                            let photo = req.files.photos[key]    
+                            //move photo to uploads directory
+                            photo.mv('./uploads/'+ id_user +'/'+id_kegiatan+'/bukti_'+key+'.jpg')
+                           
+                        }
+                    )
+                    res.send({
+                        status: true,
+                        message: 'Data Has benn updated',
+                        data: {
+                            kegiatan: req.body.kegiatan,
+                            tanggal:req.body.tanggal,
+                            harga: req.body.harga
+                        }                                                    
+                     })
+                }else {
+                    res.send({
+                             message: `Cannot Update post id = ${id_kegiatan}`
+                     })
+                 }
+            })
+        })
+} 
 // exports.UploadImagePost = async (req,res) =>{
 //     const id = req.params.id
 //     const title = req.params.title

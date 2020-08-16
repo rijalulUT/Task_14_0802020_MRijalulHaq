@@ -4,9 +4,9 @@ module.exports = app =>{
     let router = require("express").Router()
 
     //create new post
-    router.post("/",keuangan.findAll)
+     router.post("/",keuangan.findAll)
      router.post("/",keuangan.create)
-    // router.put("/image-photos/:id/:title",posts.UploadImagePost)
+     router.put("/edit/:id",keuangan.editKegiatan)
     
     app.use("/api/keuangan",auth.isAuth,router)
 }
