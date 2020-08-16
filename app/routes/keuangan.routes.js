@@ -4,7 +4,7 @@ module.exports = app =>{
     let router = require("express").Router()
 
     //create new post
-     router.post("/",keuangan.findAll)
+     router.post("/find",keuangan.findAll)
      router.post("/",keuangan.create)
      router.put("/edit/:id",keuangan.editKegiatan)
     
